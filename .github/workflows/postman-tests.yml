@@ -1,0 +1,36 @@
+name: Run Postman Collections with Newman
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-postman-collection:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Newman
+      run: npm install -g newman
+
+    - name: Run Postman Collection
+      run: newman run \MCDSE204_041230330_Assignment2\postman_collection.json -e \MCDSE204_041230330_Assignment2\postman_environment.json -r junit --reporter-junit-export results/report.xml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: postman-results
+        path: results/report.xml
